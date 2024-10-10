@@ -2,6 +2,8 @@
 const bioOverview = document.querySelector(".overview");
 //Github username
 const username = "dandyjohns";
+//Unordered list to display repos
+const ulRepos = document.querySelector(".repo-list")
 
 const getData = async function () {
     const res = await fetch(`https://api.github.com/users/${username}`);
@@ -10,19 +12,38 @@ const getData = async function () {
 };
 getData();
 
-//Fetch & Display User Information
+//Fetch & Display GitHub User Information
 const displayUserInfo = function (data) {
-    //Inside the function, create a new div and give it a class of “user-info”.
     const div = document.createElement("div");
+    div.classList.add("user-info");
     div.innerHTML = `
-        <figure>
-      <img alt="user avatar" src=${`https://avatars.githubusercontent.com/u/142632717?v=4`} />
+    <figure>
+      <img alt="user avatar" src=${data.avatar_url} />
     </figure>
     <div>
-      <p><strong>Name:</strong> ${`dandyjs`}</p>
-      <p><strong>Bio:</strong> ${`Aspiring developer diving into JavaScript and React, eager to build dynamic web applications, and excited to explore AI through innovative projects.`}</p>
-      <p><strong>Location:</strong> ${`Portland, Oregon`}</p>
-      <p><strong>Number of public repos:</strong> ${`29`}</p>
+      <p><strong>Name:</strong> ${data.name}</p>
+      <p><strong>Bio:</strong> ${data.bio}</p>
+      <p><strong>Location:</strong> ${data.location}</p>
+      <p><strong>Number of public repos:</strong> ${data.public_repos}</p>
     </div> `;
     bioOverview.append(div);
-}
+    fetchRepos();
+};
+
+//Fetch Repos
+const fetchRepos = async function () {
+    const grabRepos = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+    const repoData = await grabRepos.json();
+    displayRepoInfo(repoData);   
+};
+
+//Display Repo Info
+const displayRepoInfo = function (repos) {
+  for (const repo of repos) {
+    const repoName = document.createElement("li");
+    repoName.classList.add("repo");
+    repoName.innerHTML = `<h3>${repo.name}</h3>`;
+    ulRepos.append(repoName);
+  }  
+};
+
